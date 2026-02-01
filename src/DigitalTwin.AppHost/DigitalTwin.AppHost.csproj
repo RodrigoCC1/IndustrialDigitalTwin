@@ -1,0 +1,16 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>056ed13e-7126-40dd-9227-222abf4d6885</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalTwin.ApiService\DigitalTwin.ApiService.csproj" />
+    <ProjectReference Include="..\DigitalTwin.Web\DigitalTwin.Web.csproj" />
+  </ItemGroup>
+
+</Project>
