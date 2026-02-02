@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalTwin.ServiceDefaults\DigitalTwin.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\DigitalTwin.Application\DigitalTwin.Application.csproj" />
+    <ProjectReference Include="..\DigitalTwin.Infrastructure\DigitalTwin.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
