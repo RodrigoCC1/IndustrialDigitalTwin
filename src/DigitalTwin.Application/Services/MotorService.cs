@@ -1,4 +1,6 @@
-﻿using DigitalTwin.Domain.Entities;
+﻿using DigitalTwin.Application.DTOs;
+using DigitalTwin.Application.Interfaces;
+using DigitalTwin.Domain.Entities;
 using DigitalTwin.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,9 +15,13 @@ namespace DigitalTwin.Application.Services
         {
             _motorRepository = motorRepository;
         }
-        public async Task<Motor> CreateMotorAsync(string name, string model, double maxTemp = 155, double nominalCurrent = 12.5, double maxRPM = 1800)
+        public async Task<Motor> CreateMotorAsync(CreateMotorRequestDto request)
         {
-            var newMotor = new Motor (name, model, 155, 12.5, 1800);
+            var maxTemp = request.MaxTemperature ?? 155.0;
+            var current = request.NominalCurrent ?? 12.5;
+            var rpm = request.MaxRPM ?? 1800.0;
+
+            var newMotor = new Motor(request.Name, request.Model, maxTemp, rpm, current);
             await _motorRepository.AddMotorAsync(newMotor);
             return newMotor;
         }
@@ -43,6 +49,18 @@ namespace DigitalTwin.Application.Services
 
             await _motorRepository.UpdateMotorAsync(motor);
 
+        }
+
+        public async Task UpdateMotorAsync(UpdateMotorRequestDto motorDto)
+        {
+            var existingMotor = await _motorRepository.GetByIdAsync(motorDto.Id);
+            
+            if (existingMotor == null)
+            {
+                throw new KeyNotFoundException($"Motor with ID {motorDto.Id} not found.");
+            }
+
+            existingMotor.UpdateDetails(motorDto.Name, motorDto.Model, motorDto.MaxTemperature, motorDto.MaxRPM, motorDto.NominalCurrent);
         }
     }
 }

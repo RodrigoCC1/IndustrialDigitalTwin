@@ -11,6 +11,7 @@ namespace DigitalTwin.Application.Interfaces
         Task<Motor?> GetMotorByIDAsync(Guid id);
         Task<IEnumerable<Motor>> GetAllMotorsAsync();
         Task<Motor> CreateMotorAsync(CreateMotorRequestDto request);
+        Task UpdateMotorAsync(UpdateMotorRequestDto motorDto);
         Task ProcessTelimetryAsync(Guid motorId, double currentTemp, double currentRPM, double vibrationVelocity);
     }
 }

@@ -1,47 +1,57 @@
+using DigitalTwin.Infrastructure.Persistence;
+using DigitalTwin.Application.Interfaces;
+using DigitalTwin.Application.Services;
+using DigitalTwin.Domain.Interfaces;
+using DigitalTwin.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerUI;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add service defaults & Aspire client integrations.
+// 1. CONFIGURACIÓN POR DEFECTO (ASPIRE / CLOUD)
+// ¡IMPORTANTE! Deja esto. Configura métricas y salud automáticamente.
 builder.AddServiceDefaults();
 
-// Add services to the container.
-builder.Services.AddProblemDetails();
+// 2. AGREGAR SERVICIOS AL CONTENEDOR
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Habilitar Controladores (Vital para tu arquitectura Clean Arch)
+builder.Services.AddControllers();
+
+// Configuración de Errores y OpenAPI
+builder.Services.AddProblemDetails();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(); // Agregamos Swagger visual
+
+// --- A. CONEXIÓN A BASE DE DATOS (SQL SERVER) ---
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// --- B. INYECCIÓN DE DEPENDENCIAS (Tus Clases) ---
+builder.Services.AddScoped<IMotorRepository, MotorRepository>();
+builder.Services.AddScoped<IMotorService, MotorService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 3. CONFIGURACIÓN DEL PIPELINE HTTP
+
 app.UseExceptionHandler();
 
+// Habilitar la pantalla visual de Swagger (Para probar tu API)
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(); // <-- Este método requiere el paquete NuGet Swashbuckle.AspNetCore
 }
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
+app.UseHttpsRedirection();
 
-app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
+app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// Mapear los controladores que creemos (como el MotorController)
+app.MapControllers();
 
+// Endpoints por defecto de Aspire (Salud y Métricas)
 app.MapDefaultEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -38,6 +38,8 @@ namespace DigitalTwin.Domain.Entities
         public bool IsRunning { get; private set; }
         public DeviceStatus Status { get; private set; }
 
+        protected Motor() { }
+
         /// <summary>
         /// Initializes a new instance of the Device class with standard industrial limits.
         /// </summary>
@@ -104,6 +106,14 @@ namespace DigitalTwin.Domain.Entities
             }
         }
 
+        public void UpdateDetails(string name, string model, double maxTemp, double nominalCurrent, double maxRPM)
+        {
+            Name = name;
+            Model = model;
+            MaxOperatingTemperatureCelsius = maxTemp;
+            NominalCurrent = nominalCurrent;
+            MaxRPM = maxRPM;
+        }
         public enum DeviceStatus
         {
             Stopped,
